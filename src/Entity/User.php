@@ -123,24 +123,57 @@ class User implements \JsonSerializable
      * User constructor.
      *
      * @param string $username username
-     * @param string $email    email
+     * @param string $email email
      * @param string $password password
-     * @param bool   $enabled  enabled
-     * @param bool   $isAdmin  isAdmin
+     * @param bool $enabled enabled
+     * @param bool $isAdmin isAdmin
      */
     public function __construct(
         string $username = '',
         string $email = '',
         string $password = '',
-        bool   $enabled = true,
-        bool   $isAdmin = false
-    ) {
-        $this->id       = 0;
+        bool $enabled = true,
+        bool $isAdmin = false
+    )
+    {
+        $this->id = 0;
         $this->username = $username;
-        $this->email    = $email;
+        $this->email = $email;
         $this->setPassword($password);
-        $this->enabled  = $enabled;
-        $this->isAdmin  = $isAdmin;
+        $this->enabled = $enabled;
+        $this->isAdmin = $isAdmin;
+    }
+
+    /**
+     * @return int
+     */
+    public function getId(): int
+    {
+        return $this->id;
+    }
+
+    /**
+     * @return string
+     */
+    public function getUsername(): string
+    {
+        return $this->username;
+    }
+
+    /**
+     * @return string
+     */
+    public function getEmail(): string
+    {
+        return $this->email;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEnabled(): bool
+    {
+        return $this->enabled;
     }
 
     /**
@@ -186,11 +219,11 @@ class User implements \JsonSerializable
     public function jsonSerialize(): array
     {
         return array(
-            'id'            => $this->id,
-            'username'      => utf8_encode($this->username),
-            'email'         => utf8_encode($this->email),
-            'enabled'       => $this->enabled,
-            'admin'         => $this->isAdmin
+            'id' => $this->id,
+            'username' => utf8_encode($this->username),
+            'email' => utf8_encode($this->email),
+            'enabled' => $this->enabled,
+            'admin' => $this->isAdmin
         );
     }
 }
