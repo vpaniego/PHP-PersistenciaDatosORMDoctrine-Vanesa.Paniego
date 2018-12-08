@@ -38,11 +38,11 @@ MARCA_FIN;
 $username = isset($argv[1]) ? (string)$argv[1] : "";
 $email = isset($argv[2]) ? (string)$argv[2] : "";
 $password = isset($argv[3]) ? (string)$argv[3] : "";
-$enabled = isset($argv[4]) ? (boolean)$argv[4] : false;
-$isAdmin = isset($argv[5]) ? (boolean)$argv[5] : false;
+$enabled = isset($argv[4]) ? (boolean)$argv[4] : 1;
+$isAdmin = isset($argv[5]) ? (boolean)$argv[5] : 0;
 
 
-/* Datos validos */
+/* Data validations */
 if (empty($username) || strcmp($username, "''") === 0) {
     echo "El campo Username es obligatorio y no puede ser vacío. Por favor, indique un valor correcto." . PHP_EOL;
     exit(0);
@@ -63,10 +63,10 @@ if (empty($password) || strcmp($password, "''") === 0) {
     exit(0);
 }
 
-if (empty($enabled)) {
+/*if (empty($enabled)) {
     echo "El campo Enabled es obligatorio y no puede ser vacío. Por favor, indique un valor correcto" . PHP_EOL;
     exit(0);
-}
+}*/
 
 /** Se comprueba que no exista ya el usuario que se intenta crear */
 /** @var User $user */
