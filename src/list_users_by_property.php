@@ -30,9 +30,9 @@ if ($argc < 3 || $argc > 4) {
     Usage: $fich <Property> <Value> [<--json>] 
     Note: Consulta por <Property> id o username devuelve un único elemento. Consulta por <Property> email o enabled devuelve una lista de elementos.
     Example: 
-            >>> php list_users_by_properties.php id 999 ----> 0 ó un único resultado para la búsqueda por 'id = 999'
-            >>> php list_users_by_properties.php username userX ----> 0 ó un único resultado para la búsqueda por 'username = usernameX'
-            >>> php list_users_by_properties.php email @xxx.es ---> Tantos resultados como valores coincidan con 'email contains @xxx.es' 
+            >>> php list_users_by_property.php id 999 ----> 0 ó un único resultado para la búsqueda por 'id = 999'
+            >>> php list_users_by_property.php username userX ----> 0 ó un único resultado para la búsqueda por 'username = usernameX'
+            >>> php list_users_by_property.php email @xxx.es ---> Tantos resultados como valores coincidan con 'email contains @xxx.es' 
     
 
 MARCA_FIN;
@@ -56,7 +56,7 @@ if (empty($valor) || strcmp($valor, "''") === 0) {
 }
 
 if (strcasecmp($property, "id") !== 0 && strcasecmp($property, "username") !== 0
-    && strcasecmp($property, "email") !== 0 && strcasecmp($property, "enabled") !== 0) {
+    && strcasecmp($property, "email") !== 0) {
     echo "La propiedad por la que está intentando consultar no es valida para búsqueda. Por favor, indique un valor correcto." . PHP_EOL;
     exit(0);
 } else if (strcasecmp($property, "id") === 0 || strcasecmp($property, "username") === 0) {
