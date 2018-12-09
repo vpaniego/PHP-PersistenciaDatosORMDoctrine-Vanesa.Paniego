@@ -25,7 +25,7 @@ $dotenv->load();
 
 $entityManager = Utils::getEntityManager();
 
-echo "Puede eliminar un usuario por id o por username. Escriba 'id' si el borrado se va a hacer por id o 'username' si se va a realizar por username: ";
+echo "¿Por qué propiedad quiere realizar el borrado?. Escriba 'id' si el borrado se va a hacer por id o 'username' si se va a realizar por username: ";
 $handle = fopen("php://stdin", "rb");
 $property = fgets($handle);
 

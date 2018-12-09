@@ -23,47 +23,57 @@ $dotenv->load();
 
 $entityManager = Utils::getEntityManager();
 
-if ($argc < 3 || $argc > 4) {
-    $fich = basename(__FILE__);
-    echo <<< MARCA_FIN
+echo "¿Por qué propiedad quiere realizar la consulta?. Escriba 'id', 'username' o 'email' para realizar la consulta: ";
+$handle = fopen("php://stdin", "rb");
+$property = fgets($handle);
 
-    Usage: $fich <Property> <Value> [<--json>] 
-    Note: Consulta por <Property> id o username devuelve un único elemento. Consulta por <Property> email o enabled devuelve una lista de elementos.
-    Example: 
-            >>> php list_users_by_property.php id 999 ----> 0 ó un único resultado para la búsqueda por 'id = 999'
-            >>> php list_users_by_property.php username userX ----> 0 ó un único resultado para la búsqueda por 'username = usernameX'
-            >>> php list_users_by_property.php email @xxx.es ---> Tantos resultados como valores coincidan con 'email contains @xxx.es' 
-    
-
-MARCA_FIN;
+if (trim($property) === '') {
+    echo "ABORTADO! Es obligatorio indicar la propiedad por la que desea consultar \n";
     exit(0);
+} else if (trim($property) === 'id') {
+    echo "Indique el id (obligatorio) del usuario a consultar. Esta consulta devolverá 0 en caso de no haber coincidencia o un único registro correspondiente al valor indicado: ";
+    $value = fgets($handle);
+    if (trim($value) === '') {
+        echo "ABORTADO! Es obligatorio indicar un id de usuario \n";
+        exit(0);
+    } else if (!is_numeric(trim($value)) || trim($value) <= 0) {
+        echo "ABORTADO! No es un valor válido. \n";
+        exit(0);
+    }
+} else if (trim($property) === 'username') {
+    echo "Indique el username (obligatorio) del usuario a consultar. Esta consulta devolverá 0 en caso de no haber coincidencia o un único registro correspondiente al valor indicado: ";
+    $value = fgets($handle);
+    if (trim($value) === '') {
+        echo "ABORTADO! Es obligatorio indicar un username de usuario \n";
+        exit(0);
+    }
+} else if (trim($property) === 'email') {
+    echo "Indique el email (obligatorio) a consultar. Esta consulta devolverá tantos registros como valores contengan el valor indicado: ";
+    $value = fgets($handle);
+    if (trim($value) === '') {
+        echo "ABORTADO! Es obligatorio indicar un email de usuario \n";
+        exit(0);
+    }
+} else {
+    echo "ABORTADO! Propiedad indicada no válida para la consulta \n";
+    exit(0);
+
 }
+fclose($handle);
+echo "\n";
+echo "Gracias! Se procede a realizar la operación de consulta ...\n\n";
+
+
 
 $userRepository = $entityManager->getRepository(User::class);
 
-$property = isset($argv[1]) ? (string)$argv[1] : "";
-$valor = isset($argv[2]) ? (string)$argv[2] : "";
-
-/* Data validations */
-if (empty($property) || strcmp($property, "''") === 0) {
-    echo "Es obligatorio indicar la propiedad por la que desea consultar un usuario. Puede ser por id, por username o por email. Por favor, indique un valor correcto." . PHP_EOL;
-    exit(0);
-}
-
-if (empty($valor) || strcmp($valor, "''") === 0) {
-    echo "Es obligatorio indicar el valor por el que desea realizar la consulta. Por favor, indique un valor correcto." . PHP_EOL;
-    exit(0);
-}
-
-if (strcasecmp($property, "id") !== 0 && strcasecmp($property, "username") !== 0
-    && strcasecmp($property, "email") !== 0) {
-    echo "La propiedad por la que está intentando consultar no es valida para búsqueda. Por favor, indique un valor correcto." . PHP_EOL;
-    exit(0);
-} else if (strcasecmp($property, "id") === 0 || strcasecmp($property, "username") === 0) {
+$property = trim($property);
+$value = trim($value);
+if (strcasecmp(trim($property) ,"id") === 0 || strcasecmp(trim($property), "username") === 0) {
 
     $user = $entityManager
         ->getRepository(User::class)
-        ->findOneBy([$property => $valor]);
+        ->findOneBy([$property => $value]);
 
     if (in_array('--json', $argv, true)) {
         if (!empty($user)) {
@@ -105,7 +115,7 @@ if (strcasecmp($property, "id") !== 0 && strcasecmp($property, "username") !== 0
     */
 
     $query = $entityManager->createQuery('SELECT u FROM MiW\Results\Entity\User u WHERE u.' . $property . ' like :' . $property);
-    $query->setParameter($property, '%' . $valor . '%');
+    $query->setParameter($property, '%' . $value . '%');
     $users = $query->getResult();
 
     if (in_array('--json', $argv, true)) {
