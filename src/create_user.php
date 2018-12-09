@@ -25,66 +25,71 @@ $dotenv->load();
 
 $entityManager = Utils::getEntityManager();
 
-if ($argc < 5 || $argc > 6) {
-    $fich = basename(__FILE__);
-    echo <<< MARCA_FIN
+$handle = fopen("php://stdin", "rb");
 
-    Usage: $fich <Username> <Email> <Password> <Enabled> [<Admin>]
-
-MARCA_FIN;
-    exit(0);
-}
-
-$username = isset($argv[1]) ? (string)$argv[1] : "";
-$email = isset($argv[2]) ? (string)$argv[2] : "";
-$password = isset($argv[3]) ? (string)$argv[3] : "";
-$enabled = $argv[4];
-$isAdmin = $argv[5];
-
-
-/* Data validations */
-if (empty($username) || strcmp($username, "''") === 0) {
-    echo "El campo Username es obligatorio y no puede ser vacío. Por favor, indique un valor correcto." . PHP_EOL;
-    exit(0);
-}
-
-if (empty($email) || strcmp($email, "''") === 0) {
-    echo "El campo Email es obligatorio y no puede ser vacío. Por favor, indique un valor correcto." . PHP_EOL;
+echo "Introduce username (obligatorio): ";
+$username = fgets($handle);
+echo ">>> username: " . $username;
+if (trim($username) === '') {
+    echo "ABORTADO! Es obligatorio indicar un username \n";
     exit(0);
 } else {
-    if (false == filter_var($email, FILTER_VALIDATE_EMAIL)){
-        echo "El campo Email no tiene un formato valido. Por favor, indique un valor correcto." . PHP_EOL;
+    /** Se comprueba que no exista ya el usuario que se intenta crear */
+    /** @var User $user */
+    $username = trim($username);
+    $user = $entityManager
+        ->getRepository(User::class)
+        ->findOneBy(['username' => $username]);
+    if (!empty($user)) {
+        echo "Usuario $username ya existe en la base de datos." . PHP_EOL;
         exit(0);
     }
 }
-
-if (empty($password) || strcmp($password, "''") === 0) {
-    echo "El campo Password es obligatorio y no puede ser vacío. Por favor, indique un valor correcto." . PHP_EOL;
+echo "Introduce email (obligatorio): ";
+$email = fgets($handle);
+echo ">>> email: " . $email;
+if (trim($email) === '') {
+    echo "ABORTADO! Es obligatorio indicar email \n";
+    exit(0);
+} else if (false == filter_var(trim($email), FILTER_VALIDATE_EMAIL)) {
+    echo "El campo Email no tiene un formato valido. Por favor, indique un valor correcto." . PHP_EOL;
     exit(0);
 }
 
-if(strcmp($enabled, '0') !== 0 && strcmp($enabled, '1') !== 0){
-    echo "Valor no válido para el campo Enabled. Por favor, indique un valor correcto." . PHP_EOL;
+echo "Introduce password (obligatorio): ";
+$password = fgets($handle);
+echo ">>> password: " . $password;
+if (trim($password) === '') {
+    echo "ABORTADO! Es obligatorio indicar password \n";
     exit(0);
 }
 
-if(strcmp($isAdmin, '0') !== 0 && strcmp($isAdmin, '1') !== 0){
-    echo "Valor no válido para el campo IsAdmin. Por favor, indique un valor correcto." . PHP_EOL;
+echo "Introduce enabled (obligatario): ";
+$enabled = fgets($handle);
+echo ">>> enabled: " . $enabled;
+if (trim($enabled) === '') {
+    echo "ABORTADO! Es obligatorio indicar enabled \n";
+    exit(0);
+} else if (!is_numeric(trim($enabled)) || trim($enabled) < 0 || trim($enabled) > 1) {
+    echo "ABORTADO! No es un valor válido. Debe estar entre 0 y 1 \n";
     exit(0);
 }
 
-/** Se comprueba que no exista ya el usuario que se intenta crear */
-/** @var User $user */
-$user = $entityManager
-    ->getRepository(User::class)
-    ->findOneBy(['username' => $username]);
-if (!empty($user)) {
-    echo "Usuario $username ya existe en la base de datos." . PHP_EOL;
+echo "Introduce isAdmin: ";
+$isAdmin = fgets($handle);
+echo ">>> isAdmin: " . $isAdmin;
+if (trim($isAdmin) !== '' && !is_numeric(trim($isAdmin)) || trim($isAdmin) < 0 || trim($isAdmin) > 1) {
+    echo "ABORTADO! No es un valor válido. Debe estar entre 0 y 1 \n";
     exit(0);
 }
+
+fclose($handle);
+echo "\n";
+echo "Recogidos todos los datos necesarios para el alta de un nuevo usuario.\n\n";
+
 
 /** @var  $newUser */
-$newUser = new User($username, $email, $password, $enabled, $isAdmin);
+$newUser = new User($username, trim($email), trim($password), trim($enabled), trim($isAdmin));
 
 try {
     $entityManager->persist($newUser);
@@ -92,4 +97,24 @@ try {
     echo 'Created User with ID #' . $newUser->getId() . PHP_EOL;
 } catch (Exception $exception) {
     echo $exception->getMessage() . PHP_EOL;
+}
+
+if (in_array('--json', $argv, true)) {
+    echo json_encode($newUser, JSON_PRETTY_PRINT);
+} else {
+
+    echo PHP_EOL . sprintf(
+            '  %2s: %20s %30s %7s' . PHP_EOL,
+            'Id', 'Username:', 'Email:', 'Enabled:'
+        );
+    /** @var User $newUser */
+    echo sprintf(
+        '- %2d: %20s %30s %7s',
+        $newUser->getId(),
+        $newUser->getUsername(),
+        $newUser->getEmail(),
+        ($newUser->isEnabled()) ? 'true' : 'false'
+    ),
+    PHP_EOL;
+    echo "\nTotal: 1 users actualizado.\n\n";
 }
