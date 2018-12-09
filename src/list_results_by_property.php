@@ -107,7 +107,7 @@ if (strcasecmp(trim($property), 'id') === 0) {
 
 } else if (strcasecmp(trim($property), "time") === 0) {
     /** @var  $result */
-    $query = $entityManager->createQuery('SELECT r FROM MiW\Results\Entity\Result r WHERE r.time >= :time');
+    $query = $entityManager->createQuery('SELECT r FROM MiW\Results\Entity\Result r WHERE r.time >= :time order by r.time asc');
     $query->setParameter('time', $value);
     $results = $query->getResult();
     if (empty($results)) {
