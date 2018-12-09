@@ -14,12 +14,12 @@ use MiW\Results\Entity\Result;
 use MiW\Results\Entity\User;
 use MiW\Results\Utils;
 
-require __DIR__ . '/../vendor/autoload.php';
+require __DIR__ . '/../../vendor/autoload.php';
 
 // Carga las variables de entorno
 $dotenv = new \Dotenv\Dotenv(
-    __DIR__ . '/..',
-    Utils::getEnvFileName(__DIR__ . '/..')
+    __DIR__ . '/../../',
+    Utils::getEnvFileName(__DIR__  . '/../../')
 );
 $dotenv->load();
 
@@ -43,7 +43,7 @@ if(trim($userId) === ''){
     echo "Introduce email: ";
     $email = fgets($handle);
     echo ">>> email: " . $email;
-    if (false == filter_var(trim($email), FILTER_VALIDATE_EMAIL)){
+    if (trim($email) != '' && false == filter_var(trim($email), FILTER_VALIDATE_EMAIL)){
         echo "El campo Email no tiene un formato valido. Por favor, indique un valor correcto." . PHP_EOL;
         exit(0);
     }
@@ -55,7 +55,7 @@ if(trim($userId) === ''){
     echo "Introduce enabled: ";
     $enabled = fgets($handle);
     echo ">>> enabled: " . $enabled;
-    if (!is_numeric(trim($enabled)) || trim($enabled) < 0 || trim($enabled) > 1) {
+    if (trim($enabled) != '' && (!is_numeric(trim($enabled)) || trim($enabled) < 0 || trim($enabled) > 1)) {
         echo "ABORTADO! No es un valor válido. Debe estar entre 0 y 1 \n";
         exit(0);
     }
@@ -63,7 +63,7 @@ if(trim($userId) === ''){
     echo "Introduce isAdmin: ";
     $isAdmin = fgets($handle);
     echo ">>> isAdmin: " . $isAdmin;
-    if (!is_numeric(trim($isAdmin)) || trim($isAdmin) < 0 || trim($isAdmin) > 1) {
+    if (trim($isAdmin) != '' && (!is_numeric(trim($isAdmin)) || trim($isAdmin) < 0 || trim($isAdmin) > 1)) {
         echo "ABORTADO! No es un valor válido. Debe estar entre 0 y 1 \n";
         exit(0);
     }
