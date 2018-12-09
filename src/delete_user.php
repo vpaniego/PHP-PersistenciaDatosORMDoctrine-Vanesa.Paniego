@@ -25,38 +25,43 @@ $dotenv->load();
 
 $entityManager = Utils::getEntityManager();
 
-if ($argc < 3 || $argc > 3) {
-    $fich = basename(__FILE__);
-    echo <<< MARCA_FIN
+echo "Puede eliminar un usuario por id o por username. Escriba 'id' si el borrado se va a hacer por id o 'username' si se va a realizar por username: ";
+$handle = fopen("php://stdin", "rb");
+$property = fgets($handle);
 
-    Usage: $fich <id> <value> || <username> <value>
-    NOTE: User sólo se puede eliminar o por id o por username. Ninguna otra propiedad permite la eliminación de users. 
-
-MARCA_FIN;
+if (trim($property) === '') {
+    echo "ABORTADO! Es obligatorio indicar la propiedad por la que desea eliminar \n";
     exit(0);
-}
-
-$property = isset($argv[1]) ? $argv[1] : "";
-$value = $argv[2];
-
-/* Data validations */
-if (empty($property) || strcmp($property, "''") === 0) {
-    echo "Es obligatorio indicar la propiedad por la que desea eliminar un usuario. Puede ser por id o por username. Por favor, indique un valor correcto." . PHP_EOL;
-    exit(0);
-}
-
-if (strcasecmp($property, "id") !== 0 && strcasecmp($property, "username") !== 0) {
-    echo "La propiedad por la que está intentando eliminar no es una propiedad válida. Por favor, indique un valor correcto." . PHP_EOL;
-    exit(0);
-} else if(strcasecmp($property, "id") === 0) {
-    if (!is_numeric($value) || $value <= 0) {
-        echo "Es obligatorio indicar un id de usuario válido para poder eliminarlo. Por favor, indique un valor correcto." . PHP_EOL;
+} else if (trim($property) === 'id') {
+    echo "Indique el id (obligatorio) del usuario a eliminar: ";
+    $value = fgets($handle);
+    if (trim($value) === '') {
+        echo "ABORTADO! Es obligatorio indicar el id de usuario \n";
+        exit(0);
+    } else if (!is_numeric(trim($value)) || trim($value) <= 0) {
+        echo "ABORTADO! No es un valor válido. \n";
         exit(0);
     }
+} else if (trim($property) === 'username') {
+    echo "Indique el username (obligatorio) del usuario a eliminar: ";
+    $value = fgets($handle);
+    if (trim($value) === '') {
+        echo "ABORTADO! Es obligatorio indicar el username de usuario \n";
+        exit(0);
+    }
+} else {
+    echo "ABORTADO! Propiedad indicada no válida para el borrado \n";
+    exit(0);
+
 }
+fclose($handle);
+echo "\n";
+echo "Gracias! Se procede a realizar la operación de eliminación...\n\n";
 
 /** Se comprueba que exista el usuario que se intenta eliminar */
 /** @var User $user */
+$property = trim($property);
+$value = trim($value);
 $user = $entityManager
     ->getRepository(User::class)
     ->findOneBy([$property => $value]);
@@ -73,3 +78,4 @@ try {
 } catch (Exception $exception) {
     echo $exception->getMessage() . PHP_EOL;
 }
+
