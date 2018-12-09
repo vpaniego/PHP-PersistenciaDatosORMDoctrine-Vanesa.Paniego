@@ -70,11 +70,32 @@ if (empty($user)) {
     exit(0);
 }
 
+echo "Información de User que va a ser eliminado::: \n\n";
+
+if (in_array('--json', $argv, true)) {
+    echo json_encode($user, JSON_PRETTY_PRINT);
+} else {
+    echo PHP_EOL . sprintf(
+            '  %2s: %20s %30s %7s' . PHP_EOL,
+            'Id', 'Username:', 'Email:', 'Enabled:'
+        );
+    /** @var User $user */
+    echo sprintf(
+        '- %2d: %20s %30s %7s',
+        $user->getId(),
+        $user->getUsername(),
+        $user->getEmail(),
+        ($user->isEnabled()) ? 'true' : 'false'
+    ),
+    PHP_EOL;
+    echo "\nTotal: 1 users eliminado.\n\n";
+}
+
 /** @var  $user */
 try {
     $entityManager->remove($user);
     $entityManager->flush();
-    echo 'Eliminado User ' .$property . ' = ' . $value. PHP_EOL;
+    echo PHP_EOL . 'Eliminado User ' .$property . ' = ' . $value. PHP_EOL;
 } catch (Exception $exception) {
     echo $exception->getMessage() . PHP_EOL;
 }
