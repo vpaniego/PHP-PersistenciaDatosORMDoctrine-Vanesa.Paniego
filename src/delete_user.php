@@ -70,12 +70,65 @@ if (empty($user)) {
     exit(0);
 }
 
+/** @var  $result */
+$query = $entityManager->createQuery('SELECT r FROM MiW\Results\Entity\Result r WHERE r.user = :user');
+$query->setParameter('user', $user->getId());
+$results = $query->getResult();
+if (empty($results)) {
+    echo "Este usuario no tiene resultados que se vean afectados" . PHP_EOL;
+    exit(0);
+}
+
+imprimirResultado($user, $results, $argv);
+
 /** @var  $user */
 try {
     $entityManager->remove($user);
     $entityManager->flush();
-    echo 'Eliminado User ' .$property . ' = ' . $value. PHP_EOL;
+    echo PHP_EOL . 'Eliminado User ' .$property . ' = ' . $value. PHP_EOL;
 } catch (Exception $exception) {
     echo $exception->getMessage() . PHP_EOL;
 }
 
+function imprimirResultado($user, $results, $argv){
+
+    echo "\nInformación de User que va a ser eliminado::: \n\n";
+
+    if (in_array('--json', $argv, true)) {
+        echo json_encode($user, JSON_PRETTY_PRINT);
+    } else {
+        echo PHP_EOL . sprintf(
+                '  %2s: %20s %30s %7s' . PHP_EOL,
+                'Id', 'Username:', 'Email:', 'Enabled:'
+            );
+        /** @var User $user */
+        echo sprintf(
+            '- %2d: %20s %30s %7s',
+            $user->getId(),
+            $user->getUsername(),
+            $user->getEmail(),
+            ($user->isEnabled()) ? 'true' : 'false'
+        ),
+        PHP_EOL;
+        echo "\nTotal: 1 users eliminado.\n\n";
+    }
+
+    if(!empty($results)){
+        echo "\nInformación de Results que van a ser eliminados en cascada por la operacion de eliminar usuario::: \n\n";
+
+        if (in_array('--json', $argv, true)) {
+            echo json_encode($results, JSON_PRETTY_PRINT);
+        } else {
+            echo PHP_EOL
+                . sprintf('%3s - %3s - %22s - %s', 'Id', 'res', 'username', 'time')
+                . PHP_EOL;
+            $items = 0;
+            foreach ($results as $result) {
+
+                echo $result . PHP_EOL;
+                $items++;
+            }
+            echo PHP_EOL . "Total: $items results.\n\n";
+        }
+    }
+}

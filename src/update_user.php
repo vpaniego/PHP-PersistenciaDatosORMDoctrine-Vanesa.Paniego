@@ -73,7 +73,7 @@ echo "\n";
 echo "Gracias! Se procede a realizar la operación de modificación...\n\n";
 
 
-/** Se comprueba que no exista ya el usuario que se intenta crear */
+/** Se comprueba que no exista ya el usuario que se intenta modificar */
 /** @var User $user */
 $userId = trim($userId);
 $user = $entityManager
