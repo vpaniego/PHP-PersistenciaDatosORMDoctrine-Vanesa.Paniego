@@ -63,7 +63,7 @@ fclose($handle);
 echo "\n";
 echo "Gracias! Se procede a realizar la operación de modificación...\n\n";
 
-/** Se comprueba que no exista ya el result que se intenta modificar */
+/** Se comprueba que exista el result que se intenta modificar */
 /** @var Result $result */
 $resultId = trim($resultId);
 $result = $entityManager
