@@ -126,7 +126,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
             $entityManager->flush();
             echo '<h3 style="color: #5042f4">' . 'Created User with ID #' . $newUser->getId() . '</h3>' . PHP_EOL;
         } catch (Exception $exception) {
-            echo $exception->getMessage() . PHP_EOL;
+            echo '<p style="color: #f45642;">' . $exception->getMessage() . '</p>'. PHP_EOL;
         }
     }
 
